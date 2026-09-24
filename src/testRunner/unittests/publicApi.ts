@@ -170,6 +170,38 @@ describe("unittests:: Public APIs:: getTypeAtLocation", () => {
     });
 });
 
+describe("unittests:: Public APIs:: typeToString", () => {
+    it("does not crash computing a module specifier when the host has no current directory", () => {
+        const host = new fakes.CompilerHost(vfs.createFromFileSystem(
+            Harness.IO,
+            /*ignoreCase*/ true,
+            {
+                documents: [
+                    new documents.TextDocument("/p/package.json", `{ "name": "p", "type": "module" }`),
+                    new documents.TextDocument("/p/node_modules/dep/package.json", `{ "name": "dep", "type": "module", "exports": { ".": "./index.js" } }`),
+                    new documents.TextDocument("/p/node_modules/dep/index.d.ts", `import { Mock } from "./internal.js";\nexport declare function fn(): Mock;`),
+                    new documents.TextDocument("/p/node_modules/dep/internal.d.ts", `export interface Mock { x: number }`),
+                    new documents.TextDocument("/p/src/index.ts", `import { fn } from "dep";\nexport const f = fn();`),
+                ],
+                cwd: "/",
+            },
+        ));
+        host.getCurrentDirectory = () => "";
+
+        const program = ts.createProgram({
+            host,
+            rootNames: ["/p/src/index.ts"],
+            options: { module: ts.ModuleKind.NodeNext, noLib: true },
+        });
+
+        const checker = program.getTypeChecker();
+        const file = program.getSourceFile("/p/src/index.ts")!;
+        const [declaration] = (ts.findLast(file.statements, ts.isVariableStatement) as ts.VariableStatement).declarationList.declarations;
+        const type = checker.getTypeAtLocation(declaration);
+        assert.equal(checker.typeToString(type, file, ts.TypeFormatFlags.UseFullyQualifiedType), `import("../node_modules/dep/internal.js").Mock`);
+    });
+});
+
 describe("unittests:: Public APIs:: validateLocaleAndSetLanguage", () => {
     let savedUILocale: string | undefined;
     beforeEach(() => savedUILocale = ts.getUILocale());

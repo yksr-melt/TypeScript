@@ -594,7 +594,9 @@ function getLocalModuleSpecifier(moduleFileName: string, info: Info, compilerOpt
         return pathsOnly ? undefined : relativePath;
     }
 
-    const baseDirectory = getNormalizedAbsolutePath(getPathsBasePath(compilerOptions, host) || baseUrl!, host.getCurrentDirectory());
+    // When only package.json "imports" are in play there is neither a `paths` base nor a `baseUrl`,
+    // so fall back to the current directory rather than passing `undefined` along.
+    const baseDirectory = getNormalizedAbsolutePath(getPathsBasePath(compilerOptions, host) || baseUrl || host.getCurrentDirectory(), host.getCurrentDirectory());
     const relativeToBaseUrl = getRelativePathIfInSameVolume(moduleFileName, baseDirectory, getCanonicalFileName);
     if (!relativeToBaseUrl) {
         return pathsOnly ? undefined : relativePath;
