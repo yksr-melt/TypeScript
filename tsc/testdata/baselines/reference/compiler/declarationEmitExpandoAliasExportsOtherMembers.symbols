@@ -1,0 +1,42 @@
+//// [tests/cases/compiler/declarationEmitExpandoAliasExportsOtherMembers.ts] ////
+
+=== declarationEmitExpandoAliasExportsOtherMembers.ts ===
+function helper(): number { return 1; }
+>helper : Symbol(helper, Decl(declarationEmitExpandoAliasExportsOtherMembers.ts, 0, 0))
+
+export function Host() {}
+>Host : Symbol(Host, Decl(declarationEmitExpandoAliasExportsOtherMembers.ts, 0, 39))
+
+Host.first = 1;
+>Host.first : Symbol(Host.first, Decl(declarationEmitExpandoAliasExportsOtherMembers.ts, 1, 25))
+>Host : Symbol(Host, Decl(declarationEmitExpandoAliasExportsOtherMembers.ts, 0, 39))
+>first : Symbol(Host.first, Decl(declarationEmitExpandoAliasExportsOtherMembers.ts, 1, 25))
+
+Host.second = 'two';
+>Host.second : Symbol(Host.second, Decl(declarationEmitExpandoAliasExportsOtherMembers.ts, 2, 15))
+>Host : Symbol(Host, Decl(declarationEmitExpandoAliasExportsOtherMembers.ts, 0, 39))
+>second : Symbol(Host.second, Decl(declarationEmitExpandoAliasExportsOtherMembers.ts, 2, 15))
+
+Host.alias = helper;
+>Host.alias : Symbol(Host.alias, Decl(declarationEmitExpandoAliasExportsOtherMembers.ts, 3, 20))
+>Host : Symbol(Host, Decl(declarationEmitExpandoAliasExportsOtherMembers.ts, 0, 39))
+>alias : Symbol(Host.alias, Decl(declarationEmitExpandoAliasExportsOtherMembers.ts, 3, 20))
+>helper : Symbol(helper, Decl(declarationEmitExpandoAliasExportsOtherMembers.ts, 0, 0))
+
+function helper2(): string { return ""; }
+>helper2 : Symbol(helper2, Decl(declarationEmitExpandoAliasExportsOtherMembers.ts, 4, 20))
+
+export function Host2() {}
+>Host2 : Symbol(Host2, Decl(declarationEmitExpandoAliasExportsOtherMembers.ts, 6, 41))
+
+Host2.alias = helper2;
+>Host2.alias : Symbol(Host2.alias, Decl(declarationEmitExpandoAliasExportsOtherMembers.ts, 7, 26))
+>Host2 : Symbol(Host2, Decl(declarationEmitExpandoAliasExportsOtherMembers.ts, 6, 41))
+>alias : Symbol(Host2.alias, Decl(declarationEmitExpandoAliasExportsOtherMembers.ts, 7, 26))
+>helper2 : Symbol(helper2, Decl(declarationEmitExpandoAliasExportsOtherMembers.ts, 4, 20))
+
+Host2.after = 1;
+>Host2.after : Symbol(Host2.after, Decl(declarationEmitExpandoAliasExportsOtherMembers.ts, 8, 22))
+>Host2 : Symbol(Host2, Decl(declarationEmitExpandoAliasExportsOtherMembers.ts, 6, 41))
+>after : Symbol(Host2.after, Decl(declarationEmitExpandoAliasExportsOtherMembers.ts, 8, 22))
+

@@ -2802,6 +2802,9 @@ func (tx *DeclarationTransformer) transformExpandoAssignment(node *ast.BinaryExp
 	if ast.IsIdentifier(node.Right) {
 		// alias-like, emit an `export {name}` or `export {name as alias}`
 		result := tx.transformBinaryExpressionToExportDeclaration(node.AsNode(), exportName)
+		if !core.Some(tx.expandoMembers[hostId], ast.IsExportDeclaration) {
+			tx.addExportModifiersToExpandoMembers(hostId)
+		}
 		tx.expandoMembers[hostId] = append(tx.expandoMembers[hostId], result)
 		return
 	}
@@ -2849,13 +2852,17 @@ func (tx *DeclarationTransformer) transformExpandoAssignment(node *ast.BinaryExp
 	}
 
 	if len(statements) > 1 && !preexistingExpandoHasExport {
-		// Add an `export` modifier to all existing expando members so they remain exported after the `export {}` is added
-		for _, decl := range tx.expandoMembers[hostId] {
-			modifierFlags := ast.ModifierFlagsExport | ast.GetCombinedModifierFlags(decl)
-			decl.AsMutable().SetModifiers(tx.Factory().NewModifierList(ast.CreateModifiersFromModifierFlags(modifierFlags, tx.Factory().NewModifier)))
-		}
+		tx.addExportModifiersToExpandoMembers(hostId)
 	}
 	tx.expandoMembers[hostId] = append(tx.expandoMembers[hostId], statements...)
+}
+
+// Adds an `export` modifier to all existing expando members of a host so they remain exported after an `export {}` is added
+func (tx *DeclarationTransformer) addExportModifiersToExpandoMembers(hostId ast.NodeId) {
+	for _, decl := range tx.expandoMembers[hostId] {
+		modifierFlags := ast.ModifierFlagsExport | ast.GetCombinedModifierFlags(decl)
+		decl.AsMutable().SetModifiers(tx.Factory().NewModifierList(ast.CreateModifiersFromModifierFlags(modifierFlags, tx.Factory().NewModifier)))
+	}
 }
 
 func (tx *DeclarationTransformer) getExpandoHostId(declaration *ast.Declaration) ast.NodeId {

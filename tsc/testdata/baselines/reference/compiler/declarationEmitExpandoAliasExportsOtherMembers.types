@@ -1,0 +1,52 @@
+//// [tests/cases/compiler/declarationEmitExpandoAliasExportsOtherMembers.ts] ////
+
+=== declarationEmitExpandoAliasExportsOtherMembers.ts ===
+function helper(): number { return 1; }
+>helper : () => number
+>1 : 1
+
+export function Host() {}
+>Host : { (): void; first: number; second: string; alias: () => number; }
+
+Host.first = 1;
+>Host.first = 1 : 1
+>Host.first : number
+>Host : { (): void; first: number; second: string; alias: () => number; }
+>first : number
+>1 : 1
+
+Host.second = 'two';
+>Host.second = 'two' : "two"
+>Host.second : string
+>Host : { (): void; first: number; second: string; alias: () => number; }
+>second : string
+>'two' : "two"
+
+Host.alias = helper;
+>Host.alias = helper : () => number
+>Host.alias : () => number
+>Host : { (): void; first: number; second: string; alias: () => number; }
+>alias : () => number
+>helper : () => number
+
+function helper2(): string { return ""; }
+>helper2 : () => string
+>"" : ""
+
+export function Host2() {}
+>Host2 : { (): void; alias: () => string; after: number; }
+
+Host2.alias = helper2;
+>Host2.alias = helper2 : () => string
+>Host2.alias : () => string
+>Host2 : { (): void; alias: () => string; after: number; }
+>alias : () => string
+>helper2 : () => string
+
+Host2.after = 1;
+>Host2.after = 1 : 1
+>Host2.after : number
+>Host2 : { (): void; alias: () => string; after: number; }
+>after : number
+>1 : 1
+
